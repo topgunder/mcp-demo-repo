@@ -4,7 +4,7 @@ This project demonstrates how to use GitHub's official Model Context Protocol (M
 
 ## Requirements
 
-- Python 3.7+
+- Python 3.13+
 - GitHub Access
 - GitHub Personal Access Token with MCP permissions
 - Docker
@@ -19,7 +19,7 @@ This project demonstrates how to use GitHub's official Model Context Protocol (M
 
 2. Create and activate a virtual environment:
    ```bash
-   python -m venv venv
+   python3.13 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
@@ -44,8 +44,45 @@ This project demonstrates how to use GitHub's official Model Context Protocol (M
 
 5. Run the test script:
    ```bash
+   # Run the complete test flow
+   python test_mcp.py
+
+   # Run advanced tests
+   python test_mcp_advanced.py
+   ```
+
+## Running the MCP Server
+
+The MCP Server can be run in two ways:
+
+1. **Using Docker (Recommended)**:
+   ```bash
+   # Start the MCP Server
+   docker run --rm -i \
+     -e GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN} \
+     -w /server \
+     ghcr.io/github/github-mcp-server:latest \
+     ./github-mcp-server stdio \
+     --enable-command-logging \
+     --dynamic-toolsets
+   ```
+
+2. **Using the Test Script**:
+   ```bash
+   # Run the complete test flow
    python test_mcp.py
    ```
+
+The server will be available at:
+- Local: `http://localhost:8080`
+- Network: `http://your-ip:8080`
+
+You can verify the server is running by checking:
+- Docker container status: `docker ps`
+- Server logs: `docker logs <container_id>`
+- Test script output
+
+Note: Make sure you're connected to your organization's VPN if using GitHub Enterprise.
 
 ## Testing the MCP Server
 
@@ -76,10 +113,13 @@ The script will:
 
 ```
 python/
-├── test_mcp.py          # Main test script for MCP Server operations
-├── requirements.txt     # Python dependencies
-├── docker-compose.yml   # Docker configuration for MCP Server
-└── README.md          # This file
+├── test_mcp.py              # Main test script for MCP Server operations
+├── test_mcp_advanced.py     # Advanced tests and examples
+├── requirements.txt         # Python dependencies
+├── docker-compose.yml       # Docker configuration for MCP Server
+├── docs/                    # Documentation
+│   └── MCP_SERVER_GUIDE.md  # Detailed guide for using MCP Server
+└── README.md               # This file
 ```
 
 ## Troubleshooting
@@ -87,16 +127,20 @@ python/
 1. Authentication Error:
    - Verify your token in the `.env` file
    - Confirm the token has the required permissions
+   - Check if you're connected to VPN (for GitHub Enterprise)
 
 2. Connection Error:
    - Check if Docker is running
    - Verify your internet connection
+   - Check if the MCP Server is running on port 8080
 
 3. Dependency Error:
    - Try reinstalling dependencies: `pip install -r requirements.txt --force-reinstall`
+   - If using Python 3.13, ensure all dependencies are compatible with this version
 
 ## Support
 
 For more information about GitHub MCP, see:
 - [GitHub MCP Documentation](https://docs.github.com/en/enterprise/mcp)
 - [API Reference](https://docs.github.com/en/enterprise/mcp/api-reference)
+- [MCP Server Guide](docs/MCP_SERVER_GUIDE.md)

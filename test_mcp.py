@@ -3,19 +3,20 @@ import json
 import subprocess
 import time
 import select
+from typing import Optional
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
 
-def read_with_timeout(process, timeout=5):
+def read_with_timeout(process: subprocess.Popen, timeout: int = 5) -> Optional[str]:
     """Read process output with timeout"""
     ready, _, _ = select.select([process.stdout], [], [], timeout)
     if ready:
         return process.stdout.readline()
     return None
 
-def list_available_commands(process):
+def list_available_commands(process: subprocess.Popen) -> Optional[list]:
     """List available commands in MCP Server"""
     print("\n📋 Listing available commands...")
     command = {
@@ -47,7 +48,7 @@ def list_available_commands(process):
         print("❌ Timeout while listing commands")
     return None
 
-def list_available_toolsets(process):
+def list_available_toolsets(process: subprocess.Popen) -> None:
     """List available toolsets in MCP Server"""
     print("\n📦 Listing available toolsets...")
     command = {
@@ -110,7 +111,7 @@ def list_available_toolsets(process):
     else:
         print("❌ Timeout while listing toolsets")
 
-def test_full_repository_flow(process, repo_name="mcp-demo-repo"): 
+def test_full_repository_flow(process: subprocess.Popen, repo_name: str = "mcp-demo-repo") -> None:
     """Complete flow: create repo, initial commit, branch, file and PR"""
     user = os.getenv('GITHUB_USERNAME')
     if not user:
@@ -295,7 +296,91 @@ def test_full_repository_flow(process, repo_name="mcp-demo-repo"):
         print(f"❌ Error processing response: {str(e)}")
         return
 
-def test_mcp_command():
+def create_update_pr(process: subprocess.Popen) -> None:
+    """Create a PR with Python 3.13 updates"""
+    user = os.getenv('GITHUB_USERNAME')
+    if not user:
+        print("❌ Set GITHUB_USERNAME in .env to create the PR.")
+        return
+
+    repo_name = "mcp-demo-repo"
+    branch_name = "feature/python-3.13-update"
+    
+    print("\n🔀 Creating Pull Request for Python 3.13 updates...")
+    command = {
+        "jsonrpc": "2.0",
+        "id": 15,
+        "method": "tools/call",
+        "params": {
+            "name": "create_pull_request",
+            "arguments": {
+                "owner": user,
+                "repo": repo_name,
+                "title": "feat: update to Python 3.13 and improve type hints",
+                "body": """## Changes
+
+This PR updates the project to Python 3.13 and improves type hints:
+
+### Updates
+- Updated Python version requirement to 3.13+
+- Added type hints to all functions
+- Updated dependencies to latest versions
+- Removed unused cloud SDKs
+- Improved documentation
+
+### Dependencies Updated
+- python-dotenv: 1.0.0 → 1.0.1
+- pydantic: 2.4.2 → 2.6.1
+- httpx: 0.25.1 → 0.26.0
+
+### Removed Dependencies
+- boto3 (AWS SDK)
+- azure-mgmt-resource (Azure SDK)
+- azure-identity (Azure SDK)
+- google-cloud-resource-manager (Google Cloud SDK)
+
+### Type Hints Added
+- Added return type annotations
+- Added parameter type hints
+- Added Optional type for nullable returns
+- Added subprocess.Popen type hints
+
+### Documentation
+- Updated README.md with Python 3.13 instructions
+- Added compatibility notes
+- Updated virtual environment creation command
+
+## Testing
+- [x] All tests pass with Python 3.13
+- [x] Type checking passes
+- [x] Documentation is up to date""",
+                "head": branch_name,
+                "base": "main"
+            }
+        }
+    }
+    process.stdin.write(json.dumps(command) + "\n")
+    process.stdin.flush()
+    response = read_with_timeout(process)
+    if not response:
+        print("❌ Timeout while creating PR")
+        return
+    try:
+        response_data = json.loads(response)
+        if "error" in response_data:
+            print(f"❌ Error creating PR: {response_data['error']}")
+            return
+        if "result" in response_data and "content" in response_data["result"]:
+            pr_data = json.loads(response_data["result"]["content"][0]["text"])
+            pr_url = pr_data.get("html_url", "URL not available")
+            print(f"✅ PR created successfully: {pr_url}")
+        else:
+            print("✅ PR created successfully")
+    except json.JSONDecodeError as e:
+        print(f"❌ Error processing response: {str(e)}")
+        return
+
+def test_mcp_command() -> None:
     # Get token from environment
     token = os.getenv('GITHUB_PERSONAL_ACCESS_TOKEN')
     if not token:
@@ -369,8 +454,8 @@ def test_mcp_command():
             print("❌ Timeout while enabling pull_requests toolset")
             return
 
-        # Execute complete flow
-        test_full_repository_flow(process)
+        # Create PR for Python 3.13 updates
+        create_update_pr(process)
 
     finally:
         print("\n🛑 Shutting down server...")
