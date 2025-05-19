@@ -1,6 +1,6 @@
 # GitHub MCP Official Demo
 
-This project demonstrates how to use GitHub's official Model Context Protocol (MCP) to manage AI model context.
+This project demonstrates how to use GitHub's official Model Context Protocol (MCP) to manage AI model context. This repository was automatically created to test the complete MCP Server flow.
 
 ## Requirements
 
@@ -99,4 +99,4 @@ python/
 
 For more information about GitHub MCP, see:
 - [GitHub MCP Documentation](https://docs.github.com/en/enterprise/mcp)
-- [API Reference](https://docs.github.com/en/enterprise/mcp/api-reference) 
+- [API Reference](https://docs.github.com/en/enterprise/mcp/api-reference)
