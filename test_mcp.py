@@ -3,19 +3,20 @@ import json
 import subprocess
 import time
 import select
+from typing import Optional
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
 
-def read_with_timeout(process, timeout=5):
+def read_with_timeout(process: subprocess.Popen, timeout: int = 5) -> Optional[str]:
     """Read process output with timeout"""
     ready, _, _ = select.select([process.stdout], [], [], timeout)
     if ready:
         return process.stdout.readline()
     return None
 
-def list_available_commands(process):
+def list_available_commands(process: subprocess.Popen) -> Optional[list]:
     """List available commands in MCP Server"""
     print("\n📋 Listing available commands...")
     command = {
@@ -47,7 +48,7 @@ def list_available_commands(process):
         print("❌ Timeout while listing commands")
     return None
 
-def list_available_toolsets(process):
+def list_available_toolsets(process: subprocess.Popen) -> None:
     """List available toolsets in MCP Server"""
     print("\n📦 Listing available toolsets...")
     command = {
@@ -110,7 +111,7 @@ def list_available_toolsets(process):
     else:
         print("❌ Timeout while listing toolsets")
 
-def test_full_repository_flow(process, repo_name="mcp-demo-repo"): 
+def test_full_repository_flow(process: subprocess.Popen, repo_name: str = "mcp-demo-repo") -> None:
     """Complete flow: create repo, initial commit, branch, file and PR"""
     user = os.getenv('GITHUB_USERNAME')
     if not user:
@@ -295,7 +296,7 @@ def test_full_repository_flow(process, repo_name="mcp-demo-repo"):
         print(f"❌ Error processing response: {str(e)}")
         return
 
-def test_mcp_command():
+def test_mcp_command() -> None:
     # Get token from environment
     token = os.getenv('GITHUB_PERSONAL_ACCESS_TOKEN')
     if not token:
