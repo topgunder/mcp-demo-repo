@@ -1,0 +1,19 @@
+# GitHub API
+PyGithub>=2.1.1
+
+# Environment and utilities
+python-dotenv==1.0.0
+pydantic==2.4.2
+
+# HTTP Client
+httpx==0.25.1
+
+# AWS SDK (exemplo de provedor de nuvem)
+boto3>=1.34.0
+
+# Azure SDK (exemplo de provedor de nuvem)
+azure-mgmt-resource>=23.0.0
+azure-identity>=1.15.0
+
+# Google Cloud SDK (exemplo de provedor de nuvem)
+google-cloud-resource-manager>=1.10.0 
