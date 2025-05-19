@@ -380,6 +380,45 @@ This PR updates the project to Python 3.13 and improves type hints:
         print(f"❌ Error processing response: {str(e)}")
         return
 
+def create_readme_fix2_pr(process: subprocess.Popen) -> None:
+    """Create a PR for README adjustments (feature/readme-fix-2)"""
+    print("\n🔀 Creating Pull Request for README adjustments...")
+    command = {
+        "jsonrpc": "2.0",
+        "id": 30,
+        "method": "tools/call",
+        "params": {
+            "name": "create_pull_request",
+            "arguments": {
+                "owner": "topgunder",
+                "repo": "mcp-demo-repo",
+                "title": "docs: update README with correct port, commands, and structure",
+                "body": "This PR updates the README with:\n\n- Correct port (8080 instead of 8000)\n- Removed non-existent commands\n- Added test_mcp_advanced.py to project structure\n- Added more troubleshooting tips\n- Added link to MCP Server Guide",
+                "head": "feature/readme-fix-2",
+                "base": "main"
+            }
+        }
+    }
+    process.stdin.write(json.dumps(command) + "\n")
+    process.stdin.flush()
+    
+    response = read_with_timeout(process)
+    if response:
+        try:
+            response_data = json.loads(response)
+            if "error" in response_data:
+                print(f"❌ Error creating PR: {response_data['error']}")
+            else:
+                print("✅ PR created successfully")
+                if "result" in response_data and "content" in response_data["result"]:
+                    content = response_data["result"]["content"][0]["text"]
+                    pr_data = json.loads(content)
+                    print(f"🔗 PR URL: {pr_data.get('html_url', 'URL not available')}")
+        except json.JSONDecodeError as e:
+            print(f"❌ Error processing response: {str(e)}")
+    else:
+        print("❌ Timeout while creating PR")
+
 def test_mcp_command() -> None:
     # Get token from environment
     token = os.getenv('GITHUB_PERSONAL_ACCESS_TOKEN')
@@ -454,8 +493,8 @@ def test_mcp_command() -> None:
             print("❌ Timeout while enabling pull_requests toolset")
             return
 
-        # Create PR for Python 3.13 updates
-        create_update_pr(process)
+        # Create PR for README adjustments
+        create_readme_fix2_pr(process)
 
     finally:
         print("\n🛑 Shutting down server...")
