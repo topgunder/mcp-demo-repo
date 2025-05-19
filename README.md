@@ -4,7 +4,7 @@ This project demonstrates how to use GitHub's official Model Context Protocol (M
 
 ## Requirements
 
-- Python 3.7+
+- Python 3.13+
 - GitHub Access
 - GitHub Personal Access Token with MCP permissions
 - Docker
@@ -19,7 +19,7 @@ This project demonstrates how to use GitHub's official Model Context Protocol (M
 
 2. Create and activate a virtual environment:
    ```bash
-   python -m venv venv
+   python3.13 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
@@ -94,6 +94,7 @@ python/
 
 3. Dependency Error:
    - Try reinstalling dependencies: `pip install -r requirements.txt --force-reinstall`
+   - If using Python 3.13, ensure all dependencies are compatible with this version
 
 ## Support
 
