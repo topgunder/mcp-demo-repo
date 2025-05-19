@@ -4,7 +4,7 @@ This project demonstrates how to use GitHub's official Model Context Protocol (M
 
 ## Requirements
 
-- Python 3.7+
+- Python 3.13+
 - GitHub Access
 - GitHub Personal Access Token with MCP permissions
 - Docker
@@ -19,7 +19,7 @@ This project demonstrates how to use GitHub's official Model Context Protocol (M
 
 2. Create and activate a virtual environment:
    ```bash
-   python -m venv venv
+   python3.13 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
@@ -44,8 +44,49 @@ This project demonstrates how to use GitHub's official Model Context Protocol (M
 
 5. Run the test script:
    ```bash
+   # Development mode with auto-reload
    python test_mcp.py
+
+   # For debugging, you can run with more verbose output
+   python test_mcp.py --debug
    ```
+
+## Running the MCP Server
+
+The MCP Server can be run in two ways:
+
+1. **Using Docker (Recommended)**:
+   ```bash
+   # Start the MCP Server
+   docker run --rm -i \
+     -e GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN} \
+     -w /server \
+     ghcr.io/github/github-mcp-server:latest \
+     ./github-mcp-server stdio \
+     --enable-command-logging \
+     --dynamic-toolsets
+   ```
+
+2. **Using the Test Script**:
+   ```bash
+   # Run the complete test flow
+   python test_mcp.py
+
+   # Run specific operations
+   python test_mcp.py --operation create_repo
+   python test_mcp.py --operation create_pr
+   ```
+
+The server will be available at:
+- Local: `http://localhost:8000`
+- Network: `http://your-ip:8000`
+
+You can verify the server is running by checking:
+- Docker container status: `docker ps`
+- Server logs: `docker logs <container_id>`
+- Test script output
+
+Note: Make sure you're connected to your organization's VPN if using GitHub Enterprise.
 
 ## Testing the MCP Server
 
@@ -94,6 +135,7 @@ python/
 
 3. Dependency Error:
    - Try reinstalling dependencies: `pip install -r requirements.txt --force-reinstall`
+   - If using Python 3.13, ensure all dependencies are compatible with this version
 
 ## Support
 

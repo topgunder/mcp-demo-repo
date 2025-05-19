@@ -2,11 +2,11 @@
 PyGithub>=2.1.1
 
 # Environment and utilities
-python-dotenv==1.0.0
-pydantic==2.4.2
+python-dotenv>=1.0.1
+pydantic>=2.6.1
 
 # HTTP Client
-httpx==0.25.1
+httpx>=0.26.0
 
 # AWS SDK (exemplo de provedor de nuvem)
 boto3>=1.34.0
